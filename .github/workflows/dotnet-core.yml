@@ -21,5 +21,3 @@ jobs:
       run: dotnet restore ./src/ConcurrentAccessRestriction.sln
     - name: Build
       run: dotnet build ./src/ConcurrentAccessRestriction.sln --configuration Release --no-restore
-    - name: Test
-      run: dotnet test ./src/ConcurrentAccessRestriction.sln--no-restore --verbosity normal
