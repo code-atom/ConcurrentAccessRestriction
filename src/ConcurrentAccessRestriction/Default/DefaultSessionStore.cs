@@ -15,7 +15,7 @@ namespace ConcurrentAccessRestriction.Default
 
         public override Task CreateAsync(UserSession session)
         {
-           if(session == null)
+            throw new NotImplementedException();
         }
 
         public override Task RemoveAsync(string sessionIdentifier)
