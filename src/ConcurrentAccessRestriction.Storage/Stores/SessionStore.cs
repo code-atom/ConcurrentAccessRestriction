@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ConcurrentAccessRestriction.Storage.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,6 +23,9 @@ namespace ConcurrentAccessRestriction.Storage.Stores
         /// </summary>
         /// <param name="sessionIdentifier"></param>
         /// <returns></returns>
-        public abstract Task RemoveAsync(string sessionIdentifier);
+        public abstract Task RemoveAsync(ISessionIdentifier sessionIdentifier);
+
+
+        public abstract IEnumerable<T> GetSessions(ISessionIdentifier ISessionIdentifier);
     }
 }

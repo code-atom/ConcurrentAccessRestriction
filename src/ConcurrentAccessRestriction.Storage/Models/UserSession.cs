@@ -18,7 +18,7 @@ namespace ConcurrentAccessRestriction.Storage
             }
         }
 
-        public UserSession(string username, string sessionid) 
+        public UserSession(string sessionid, string username) 
         {
             Username = username;
             Id = sessionid;
