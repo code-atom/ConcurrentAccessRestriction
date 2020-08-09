@@ -1,3 +1,3 @@
 # ConcurrentAccessRestriction
 Concurrent Access Restriction module for asp.net core website 
-![example workflow name](https://github.com/code-atom/ConcurrentAccessRestriction/.github/workflows/dotnet-core.yml/badge.svg)
+![.NET Core](https://github.com/code-atom/ConcurrentAccessRestriction/workflows/.NET%20Core/badge.svg)
