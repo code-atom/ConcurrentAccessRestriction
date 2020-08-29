@@ -5,11 +5,11 @@ using System.Text;
 
 namespace ConcurrentAccessRestriction.Storage
 {
-    public class UserSession : Session, ISessionIdentifier
+    public class UserSession : Session
     {
         public string Username { get; set; }
 
-        public string SessionIdentifier
+        public override string SessionIdentifier
         {
             get
             {

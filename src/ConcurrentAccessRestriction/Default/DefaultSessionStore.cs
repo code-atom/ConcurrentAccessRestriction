@@ -40,6 +40,7 @@ namespace ConcurrentAccessRestriction.Default
 
         public override Task RemoveAsync(ISessionIdentifier sessionIdentifier)
         {
+            return Task.CompletedTask;
         }
     }
 }

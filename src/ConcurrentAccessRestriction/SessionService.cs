@@ -1,5 +1,6 @@
 ﻿using ConcurrentAccessRestriction.Interface;
 using ConcurrentAccessRestriction.Storage;
+using ConcurrentAccessRestriction.Storage.Interfaces;
 using ConcurrentAccessRestriction.Storage.Stores;
 using Microsoft.Extensions.Logging;
 using System;
@@ -23,6 +24,16 @@ namespace ConcurrentAccessRestriction
         {
             var session = new UserSession(sessionId, username);
             sessionStore.CreateAsync(session);
+        }
+
+        public IEnumerable<Session> GetSessions(ISessionIdentifier sessionIdentifier)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RemoveSession(string sessionId, string username)
+        {
+            throw new NotImplementedException();
         }
     }
 }
