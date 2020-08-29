@@ -9,7 +9,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConcurrentAccessRestriction
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConcurrentAccessRestriction", "ConcurrentAccessRestriction\ConcurrentAccessRestriction.csproj", "{38BD84DD-2FC5-4E89-AD31-B4733EC80D3C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConcurrentAccessRestriction.Storage.SqlServer", "ConcurrentAccessRestriction.Storage.SqlServer\ConcurrentAccessRestriction.Storage.SqlServer.csproj", "{697BF95D-D556-4778-A96A-40E97B04FFE8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConcurrentAccessRestriction.Storage.SqlServer", "ConcurrentAccessRestriction.Storage.SqlServer\ConcurrentAccessRestriction.Storage.SqlServer.csproj", "{697BF95D-D556-4778-A96A-40E97B04FFE8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CE5D4FEF-2609-4069-817F-75D5A9C7D41F}"
+	ProjectSection(SolutionItems) = preProject
+		.filenesting.json = .filenesting.json
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConcurrentAccessRestriction.Tests", "ConcurrentAccessRestriction.Tests\ConcurrentAccessRestriction.Tests.csproj", "{870B9240-4AA5-4EDB-A2AB-26B83213131B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +40,10 @@ Global
 		{697BF95D-D556-4778-A96A-40E97B04FFE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{697BF95D-D556-4778-A96A-40E97B04FFE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{697BF95D-D556-4778-A96A-40E97B04FFE8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{870B9240-4AA5-4EDB-A2AB-26B83213131B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{870B9240-4AA5-4EDB-A2AB-26B83213131B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{870B9240-4AA5-4EDB-A2AB-26B83213131B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{870B9240-4AA5-4EDB-A2AB-26B83213131B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

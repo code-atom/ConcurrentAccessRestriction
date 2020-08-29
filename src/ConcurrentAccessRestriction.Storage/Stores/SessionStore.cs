@@ -23,7 +23,7 @@ namespace ConcurrentAccessRestriction.Storage.Stores
         /// </summary>
         /// <param name="sessionIdentifier"></param>
         /// <returns></returns>
-        public abstract Task RemoveAsync(ISessionIdentifier sessionIdentifier);
+        public abstract Task RemoveAsync(T session);
 
 
         public abstract IEnumerable<T> GetSessions(ISessionIdentifier ISessionIdentifier);

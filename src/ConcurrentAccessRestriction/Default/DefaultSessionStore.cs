@@ -11,9 +11,9 @@ using System.Threading.Tasks;
 
 namespace ConcurrentAccessRestriction.Default
 {
-    public class DefaultSessionStore : SessionStore<UserSession>
+    public class DefaultSessionStore : SessionStore<Session>
     {
-        private static ConcurrentBag<UserSession> userSessions = new ConcurrentBag<UserSession>();
+        private static ConcurrentDictionary<string, Session> userSessions = new ConcurrentDictionary<string, Session>();
         private readonly ILogger<DefaultSessionStore> logger;
 
         public DefaultSessionStore(ILogger<DefaultSessionStore> logger)
@@ -21,25 +21,35 @@ namespace ConcurrentAccessRestriction.Default
             this.logger = logger;
         }
 
-        public override Task CreateAsync(UserSession session)
+        public override Task CreateAsync(Session session)
         {
+            logger.LogTrace("[DefaultSessionStore].[CreateAsync]: Add new session into session store");
             if (session == null)
             {
+                logger.LogTrace("[DefaultSessionStore].[CreateAsync]: session is required");
                 throw new ArgumentNullException($"{nameof(session)} is required parameter");
             }
 
-            userSessions.Add(session);
+            if (userSessions.TryAdd(session.Id, session))
+            {
+                logger.LogInformation($"[DefaultSessionStore].[CreateAsync]: Session: {session.Id} added successfully");
+            }
             return Task.CompletedTask;
         }
 
-        public override IEnumerable<UserSession> GetSessions(ISessionIdentifier session)
+        public override IEnumerable<Session> GetSessions(ISessionIdentifier session)
         {
-            var sessions = userSessions.Where(x => x.SessionIdentifier == session.SessionIdentifier).ToList();
+            var sessions = userSessions.Where(x => x.Value.SessionIdentifier == session.SessionIdentifier).Select(x => x.Value).ToList();
             return sessions;
         }
 
-        public override Task RemoveAsync(ISessionIdentifier sessionIdentifier)
+        public override Task RemoveAsync(Session session)
         {
+            logger.LogTrace("[DefaultSessionStore].[RemoveAsync]: Remove session from session store");
+            if (userSessions.TryRemove(session.Id, out Session deleteSession))
+            {
+                logger.LogInformation($"[DefaultSessionStore].[RemoveAsync]: Session: {deleteSession.Id} removed successfully");
+            }
             return Task.CompletedTask;
         }
     }

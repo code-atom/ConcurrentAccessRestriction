@@ -11,6 +11,6 @@ namespace ConcurrentAccessRestriction.Storage
 
         public abstract string SessionIdentifier { get; }
 
-        public DateTimeOffset CreatedTime { get; set; }
+        public DateTimeOffset CreatedTime { get; set; } = DateTimeOffset.UtcNow;
     }
 }
