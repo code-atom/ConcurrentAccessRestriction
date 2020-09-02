@@ -43,6 +43,15 @@ namespace ConcurrentAccessRestriction.Default
             return sessions;
         }
 
+        public override Session GetSession(string sessionId)
+        {
+            if (userSessions.TryGetValue(sessionId, out Session session))
+            {
+                return session;
+            }
+            return default;
+        }
+
         public override Task RemoveAsync(Session session)
         {
             logger.LogTrace("[DefaultSessionStore].[RemoveAsync]: Remove session from session store");

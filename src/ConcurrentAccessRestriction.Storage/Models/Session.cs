@@ -12,5 +12,16 @@ namespace ConcurrentAccessRestriction.Storage
         public abstract string SessionIdentifier { get; }
 
         public DateTimeOffset CreatedTime { get; set; } = DateTimeOffset.UtcNow;
+
+        public DateTimeOffset? ExpirationTime { get; set; }
+
+
+        public bool IsExpired
+        {
+            get
+            {
+                return !ExpirationTime.HasValue || DateTimeOffset.UtcNow > ExpirationTime;
+            }
+        }
     }
 }

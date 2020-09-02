@@ -12,6 +12,10 @@ namespace ConcurrentAccessRestriction.Interface
 
         IEnumerable<Session> GetSessions(ISessionIdentifier sessionIdentifier);
 
+        Session GetSession(string sessionId);
+
         void RemoveSession(string sessionId, string username);
+
+        void SetExpiration(Session session);
     }
 }

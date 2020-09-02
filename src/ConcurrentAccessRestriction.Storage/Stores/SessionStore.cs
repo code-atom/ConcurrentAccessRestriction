@@ -26,6 +26,18 @@ namespace ConcurrentAccessRestriction.Storage.Stores
         public abstract Task RemoveAsync(T session);
 
 
+        /// <summary>
+        /// Retrieve list of sessions that are generated for user/device
+        /// </summary>
+        /// <param name="ISessionIdentifier"></param>
+        /// <returns></returns>
         public abstract IEnumerable<T> GetSessions(ISessionIdentifier ISessionIdentifier);
+
+        /// <summary>
+        /// Retrieve session detail from Session Id.
+        /// </summary>
+        /// <param name="sessionId"></param>
+        /// <returns></returns>
+        public abstract T GetSession(string sessionId);
     }
 }

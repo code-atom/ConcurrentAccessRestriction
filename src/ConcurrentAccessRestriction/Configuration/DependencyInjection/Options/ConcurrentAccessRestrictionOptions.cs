@@ -15,5 +15,10 @@ namespace ConcurrentAccessRestriction.Configuration.DependencyInjection.Options
         /// Number of concurrent session allowed
         /// </summary>
         public int NumberOfAllowedSessions { get; set; } = 5;
+
+        /// <summary>
+        /// Session expiration 
+        /// </summary>
+        public TimeSpan SlideExpirationTime { get; set; } = TimeSpan.FromMinutes(15);
     }
 }

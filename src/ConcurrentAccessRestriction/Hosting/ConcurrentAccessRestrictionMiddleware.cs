@@ -36,12 +36,24 @@ namespace ConcurrentAccessRestriction.Hosting
                     throw new InvalidOperationException("No session exist");
                 }
 
-                var sessions = sessionService.GetSessions(currentSession);
-                if (sessions.Count() > option.NumberOfAllowedSessions)
+                if (!currentSession.ExpirationTime.HasValue)
                 {
-                    logger.LogError($"[ConcurrentAccessRestrictionMiddleware].[Invoke] Session limit: {option.NumberOfAllowedSessions} exceed for current user");
-                    throw new SessionLimitExceedException(currentSession, "Current user exceed the session limit");
+                    var sessions = sessionService.GetSessions(currentSession);
+                    if (sessions.Count() > option.NumberOfAllowedSessions)
+                    {
+                        logger.LogError($"[ConcurrentAccessRestrictionMiddleware].[Invoke] Session limit: {option.NumberOfAllowedSessions} exceed for current user");
+                        throw new SessionLimitExceedException(currentSession, "Current user exceed the session limit");
+                    }
                 }
+                else
+                {
+                    if (currentSession.IsExpired)
+                    {
+                        logger.LogError($"[ConcurrentAccessRestrictionMiddleware].[Invoke] Session: {currentSession.Id} is expired");
+                        throw new UnauthorizedAccessException("Session expired");
+                    }
+                }
+                sessionService.SetExpiration(currentSession);
             }
             await next(context);
         }
