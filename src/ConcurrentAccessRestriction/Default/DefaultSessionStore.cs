@@ -13,7 +13,7 @@ namespace ConcurrentAccessRestriction.Default
 {
     public class DefaultSessionStore : SessionStore<Session>
     {
-        private static ConcurrentDictionary<string, Session> userSessions = new ConcurrentDictionary<string, Session>();
+        private ConcurrentDictionary<string, Session> userSessions = new ConcurrentDictionary<string, Session>();
         private readonly ILogger<DefaultSessionStore> logger;
 
         public DefaultSessionStore(ILogger<DefaultSessionStore> logger)

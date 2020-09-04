@@ -25,7 +25,6 @@ namespace ConcurrentAccessRestriction.Storage.Stores
         /// <returns></returns>
         public abstract Task RemoveAsync(T session);
 
-
         /// <summary>
         /// Retrieve list of sessions that are generated for user/device
         /// </summary>

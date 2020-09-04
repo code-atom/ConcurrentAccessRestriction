@@ -3,18 +3,19 @@ using ConcurrentAccessRestriction.Storage.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace ConcurrentAccessRestriction.Interface
 {
     public interface ISessionService
     {
-        void AddSession(string sessionId, string username);
+        Task AddSession(string sessionId, string username);
 
         IEnumerable<Session> GetSessions(ISessionIdentifier sessionIdentifier);
 
         Session GetSession(string sessionId);
 
-        void RemoveSession(string sessionId, string username);
+        Task RemoveSession(string sessionId);
 
         void SetExpiration(Session session);
     }

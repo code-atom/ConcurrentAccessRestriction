@@ -9,23 +9,24 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace ConcurrentAccessRestriction
 {
     public class SessionService : ISessionService
     {
         private readonly ILogger<SessionService> logger;
-        private readonly SessionStore<UserSession> sessionStore;
+        private readonly SessionStore<Session> sessionStore;
         private readonly ConcurrentAccessRestrictionOptions option;
 
-        public SessionService(ILogger<SessionService> logger, SessionStore<UserSession> sessionStore, IOptions<ConcurrentAccessRestrictionOptions> option)
+        public SessionService(ILogger<SessionService> logger, SessionStore<Session> sessionStore, IOptions<ConcurrentAccessRestrictionOptions> option)
         {
             this.logger = logger;
             this.sessionStore = sessionStore;
             this.option = option.Value;
         }
 
-        public void AddSession(string sessionId, string username)
+        public async Task AddSession(string sessionId, string username)
         {
             logger.LogInformation($"[SessionService].[AddSession]: Add session: {sessionId} of user {username} into session store");
             var exisitingSession = GetSession(sessionId);
@@ -33,7 +34,7 @@ namespace ConcurrentAccessRestriction
             {
                 logger.LogInformation($"[SessionService].[AddSession]: New session: {sessionId} for user { username} add into session store");
                 var session = UserSession.Create(sessionId, username);
-                sessionStore.CreateAsync(session);
+                await sessionStore.CreateAsync(session);
                 logger.LogInformation($"[SessionService].[AddSession]: New session: {sessionId} for user { username} added into session store");
             }
         }
@@ -49,9 +50,11 @@ namespace ConcurrentAccessRestriction
             return sessionStore.GetSessions(sessionIdentifier);
         }
 
-        public void RemoveSession(string sessionId, string username)
+        public  async Task RemoveSession(string sessionId)
         {
-            throw new NotImplementedException();
+            var session = GetSession(sessionId);
+            session.ThrowIfNull($"Session: {sessionId} doesn't exist");
+            await sessionStore.RemoveAsync(session);
         }
 
         public void SetExpiration(Session session)
@@ -61,6 +64,7 @@ namespace ConcurrentAccessRestriction
             if (timeRemaining < TimeSpan.FromMinutes(1))
             {
                 session.ExpirationTime = DateTimeOffset.UtcNow + option.SlideExpirationTime;
+                //TODO: Complete method
             }
         }
     }

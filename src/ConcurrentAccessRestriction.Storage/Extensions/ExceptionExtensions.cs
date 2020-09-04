@@ -21,5 +21,14 @@ namespace ConcurrentAccessRestriction.Storage.Extensions
                 throw new ArgumentNullException(message);
             }
         }
+
+
+        public static void ThrowIfNull(this object @object, string message)
+        {
+            if (@object == null)
+            {
+                throw new InvalidOperationException(message);
+            }
+        }
     }
 }

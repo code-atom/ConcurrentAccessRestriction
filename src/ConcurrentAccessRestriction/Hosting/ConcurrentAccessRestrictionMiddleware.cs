@@ -38,6 +38,7 @@ namespace ConcurrentAccessRestriction.Hosting
 
                 if (!currentSession.ExpirationTime.HasValue)
                 {
+                   //TODO: Expired the latest session if limit exceed. in concurrent access
                     var sessions = sessionService.GetSessions(currentSession);
                     if (sessions.Count() > option.NumberOfAllowedSessions)
                     {
