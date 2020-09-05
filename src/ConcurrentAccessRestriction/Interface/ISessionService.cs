@@ -17,6 +17,6 @@ namespace ConcurrentAccessRestriction.Interface
 
         Task RemoveSession(string sessionId);
 
-        void SetExpiration(Session session);
+        Task ExtendSessionExpiration(string sessionId);
     }
 }

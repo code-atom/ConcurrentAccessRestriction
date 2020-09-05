@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace ConcurrentAccessRestriction.Tests
 {
@@ -13,7 +14,7 @@ namespace ConcurrentAccessRestriction.Tests
 
         public const string MockSessionId = "00-000-000";
         public const string MockUserSession = "test.user@mail.com";
-        
+
 
         public static string RandomSessionId
         {
@@ -39,6 +40,21 @@ namespace ConcurrentAccessRestriction.Tests
                 return new ClaimsIdentity("mock");
             }
         }
+
+
+        public static RequestDelegate InnerHandler = (innerHttpContext) =>
+        {
+            return Task.CompletedTask;
+        };
+
+        public static DateTimeOffset ExpirationTime
+        {
+            get
+            {
+                return DateTimeOffset.MinValue;
+            }
+        }
+
 
         public static class Claims
         {

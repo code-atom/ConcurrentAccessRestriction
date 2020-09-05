@@ -17,13 +17,15 @@ namespace ConcurrentAccessRestriction
     {
         private readonly ILogger<SessionService> logger;
         private readonly SessionStore<Session> sessionStore;
-        private readonly ConcurrentAccessRestrictionOptions option;
+        private readonly IOptions<ConcurrentAccessRestrictionOptions> option;
+        private readonly ISystemClock systemClock;
 
-        public SessionService(ILogger<SessionService> logger, SessionStore<Session> sessionStore, IOptions<ConcurrentAccessRestrictionOptions> option)
+        public SessionService(ILogger<SessionService> logger, SessionStore<Session> sessionStore, IOptions<ConcurrentAccessRestrictionOptions> option, ISystemClock systemClock)
         {
             this.logger = logger;
             this.sessionStore = sessionStore;
-            this.option = option.Value;
+            this.option = option;
+            this.systemClock = systemClock;
         }
 
         public async Task AddSession(string sessionId, string username)
@@ -57,14 +59,25 @@ namespace ConcurrentAccessRestriction
             await sessionStore.RemoveAsync(session);
         }
 
-        public void SetExpiration(Session session)
+        public async Task ExtendSessionExpiration(string sessionId)
         {
-            var currentUtc = DateTimeOffset.UtcNow;
-            var timeRemaining = currentUtc.Subtract(session.ExpirationTime.GetValueOrDefault(currentUtc));
-            if (timeRemaining < TimeSpan.FromMinutes(1))
+            var session = GetSession(sessionId);
+            session.ThrowIfNull($"Session: {sessionId} doesn't exist");
+            var currentUtc = systemClock.UtcNow;
+            if (session.ExpirationTime.HasValue)
             {
-                session.ExpirationTime = DateTimeOffset.UtcNow + option.SlideExpirationTime;
-                //TODO: Complete method
+                var timeRemaining = currentUtc.Subtract(session.ExpirationTime.GetValueOrDefault(currentUtc));
+                if (timeRemaining < TimeSpan.FromMinutes(1))
+                {
+                    session.ExtendSession(option.Value.SlideExpirationTime);
+                    await sessionStore.UpdateAsync(session);
+                }
+            }
+            else
+            {
+                var expiration = currentUtc + option.Value.SlideExpirationTime;
+                session.SetExpirationTime(expiration);
+                await sessionStore.UpdateAsync(session);
             }
         }
     }

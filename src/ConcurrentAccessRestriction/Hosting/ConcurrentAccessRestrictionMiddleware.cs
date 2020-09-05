@@ -14,19 +14,19 @@ namespace ConcurrentAccessRestriction.Hosting
     {
         private readonly RequestDelegate next;
         private readonly ILogger<ConcurrentAccessRestrictionMiddleware> logger;
-        private readonly ConcurrentAccessRestrictionOptions option;
+        private readonly IOptions<ConcurrentAccessRestrictionOptions> option;
 
         public ConcurrentAccessRestrictionMiddleware(RequestDelegate next, ILogger<ConcurrentAccessRestrictionMiddleware> logger, IOptions<ConcurrentAccessRestrictionOptions> currentAccessRestrictionOptions)
         {
             this.next = next;
             this.logger = logger;
-            this.option = currentAccessRestrictionOptions.Value;
+            this.option = currentAccessRestrictionOptions;
         }
 
         public async Task Invoke(HttpContext context, ISessionService sessionService, ISessionResolver currentSessionResolver)
         {
             logger.LogTrace("[ConcurrentAccessRestrictionMiddleware].[Invoke] Validate whether request is authenticated to process by middleware");
-            if (context.User.Identity.IsAuthenticated && option.ConcurrentAccessEnabled)
+            if (context.User.Identity.IsAuthenticated && option.Value.ConcurrentAccessEnabled)
             {
                 logger.LogTrace("[ConcurrentAccessRestrictionMiddleware].[Invoke] User authenticated, validate whether session exist or not.");
                 var currentSession = currentSessionResolver.CurrentSession(context);
@@ -40,9 +40,9 @@ namespace ConcurrentAccessRestriction.Hosting
                 {
                    //TODO: Expired the latest session if limit exceed. in concurrent access
                     var sessions = sessionService.GetSessions(currentSession);
-                    if (sessions.Count() > option.NumberOfAllowedSessions)
+                    if (sessions.Count() > option.Value.NumberOfAllowedSessions)
                     {
-                        logger.LogError($"[ConcurrentAccessRestrictionMiddleware].[Invoke] Session limit: {option.NumberOfAllowedSessions} exceed for current user");
+                        logger.LogError($"[ConcurrentAccessRestrictionMiddleware].[Invoke] Session limit: {option.Value.NumberOfAllowedSessions} exceed for current user");
                         throw new SessionLimitExceedException(currentSession, "Current user exceed the session limit");
                     }
                 }
@@ -54,7 +54,7 @@ namespace ConcurrentAccessRestriction.Hosting
                         throw new UnauthorizedAccessException("Session expired");
                     }
                 }
-                sessionService.SetExpiration(currentSession);
+                await sessionService.ExtendSessionExpiration(currentSession.Id);
             }
             await next(context);
         }

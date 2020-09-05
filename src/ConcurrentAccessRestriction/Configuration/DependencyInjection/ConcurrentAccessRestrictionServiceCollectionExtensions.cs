@@ -10,15 +10,18 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
+    [ExcludeFromCodeCoverage]
     public static class ConcurrentAccessRestrictionServiceCollectionExtensions
     {
         public static ServiceBuilder AddConcurrentAccessRestriction(this IServiceCollection services)
         {
             var builder = new ServiceBuilder(services);
+            builder.Services.TryAddSingleton<ISystemClock, DefaultSystemClock>();
             builder.Services.TryAddTransient<ISessionResolver, DefaultSessionResolver>();
             builder.Services.TryAddSingleton<ISessionService, SessionService>();
             return builder;
@@ -28,6 +31,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             var builder = new ServiceBuilder(services);
             builder.Services.Configure(setupAction);
+            builder.Services.TryAddSingleton<ISystemClock, DefaultSystemClock>();
             builder.Services.TryAddTransient<ISessionResolver, DefaultSessionResolver>();
             builder.Services.TryAddSingleton<ISessionService, SessionService>();
             return builder;

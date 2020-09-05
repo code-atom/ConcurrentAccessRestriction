@@ -7,10 +7,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace ConcurrentAccessRestriction.Configuration
 {
+    [ExcludeFromCodeCoverage]
     public static class ConcurrentAccessRestrictionApplicationBuilderExtensions
     {
         public static  IApplicationBuilder UseConcurrentAccessRestriction(this IApplicationBuilder applicationBuilder)
@@ -34,7 +36,7 @@ namespace ConcurrentAccessRestriction.Configuration
             using (var scope = scopeFactory.CreateScope())
             {
                 var serviceProvider = scope.ServiceProvider;
-                TestService(serviceProvider, typeof(SessionStore<Session>), logger, "No storage mechanism for session specified. Use the 'AddInMemoryPersistedGrants' extension method to register a development version.", false);
+                TestService(serviceProvider, typeof(SessionStore<Session>), logger, "No storage mechanism for session specified. Use the 'AddInMemorySessionStore' extension method to register a development version.", false);
 
                 var sessionStore = serviceProvider.GetService(typeof(SessionStore<Session>));
 

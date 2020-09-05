@@ -15,12 +15,17 @@ namespace ConcurrentAccessRestriction.Tests
 {
     public class DefaultSesssionStoreTest
     {
-      
+        private DefaultSessionStore sessionStore;
+
+        public DefaultSesssionStoreTest()
+        {
+            sessionStore = new DefaultSessionStore(NullLogger<DefaultSessionStore>.Instance);
+        }
+
 
         [Fact]
         public async Task Create_Session_Success()
         {
-            var sessionStore = new DefaultSessionStore(NullLogger<DefaultSessionStore>.Instance);
             var session = UserSession.Create(MockData.MockSessionId, MockData.MockUserSession);
 
             await sessionStore.CreateAsync(session);
@@ -34,7 +39,6 @@ namespace ConcurrentAccessRestriction.Tests
         [Fact]
         public async Task Create_Duplicate_Session()
         {
-            var sessionStore = new DefaultSessionStore(NullLogger<DefaultSessionStore>.Instance);
             var session = UserSession.Create(MockData.MockSessionId, MockData.MockUserSession);
 
             await sessionStore.CreateAsync(session);
@@ -48,14 +52,12 @@ namespace ConcurrentAccessRestriction.Tests
         [Fact]
         public async Task Create_Session_Exception_If_Session_Null()
         {
-            var sessionStore = new DefaultSessionStore(NullLogger<DefaultSessionStore>.Instance);
             await Assert.ThrowsAsync<ArgumentNullException>(() => sessionStore.CreateAsync(null));
         }
 
         [Fact]
         public async Task Retrieve_List_Of_Session()
         {
-            var sessionStore = new DefaultSessionStore(NullLogger<DefaultSessionStore>.Instance);
             await sessionStore.CreateAsync(UserSession.Create(MockData.RandomSessionId, MockData.MockUserSession));
             await sessionStore.CreateAsync(UserSession.Create(MockData.RandomSessionId, MockData.MockUserSession));
             await sessionStore.CreateAsync(UserSession.Create(MockData.RandomSessionId, MockData.MockUserSession));
@@ -71,7 +73,6 @@ namespace ConcurrentAccessRestriction.Tests
         [Fact]
         public async Task Retrieve_User_Session()
         {
-            var sessionStore = new DefaultSessionStore(NullLogger<DefaultSessionStore>.Instance);
             await sessionStore.CreateAsync(MockData.UserSession);
 
             var session = sessionStore.GetSession(MockData.MockSessionId);
@@ -90,7 +91,6 @@ namespace ConcurrentAccessRestriction.Tests
         [Fact]
         public async Task Remove_Session_Success()
         {
-            var sessionStore = new DefaultSessionStore(NullLogger<DefaultSessionStore>.Instance);
             await sessionStore.CreateAsync(MockData.UserSession);
 
             await sessionStore.RemoveAsync(MockData.UserSession);
@@ -102,11 +102,45 @@ namespace ConcurrentAccessRestriction.Tests
         [Fact]
         public async Task Remove_Non_Exist_Session()
         {
-            var sessionStore = new DefaultSessionStore(NullLogger<DefaultSessionStore>.Instance);
+            await sessionStore.CreateAsync(UserSession.Create(MockData.RandomSessionId, MockData.MockUserSession));
+            await sessionStore.CreateAsync(UserSession.Create(MockData.RandomSessionId, MockData.MockUserSession));
+            await sessionStore.CreateAsync(UserSession.Create(MockData.RandomSessionId, MockData.MockUserSession));
+
             await sessionStore.RemoveAsync(MockData.UserSession);
 
-            var session = sessionStore.GetSession(MockData.MockSessionId);
-            Assert.Null(session);
+            var sessions= sessionStore.GetSessions(MockData.UserSession);
+            Assert.NotNull(sessions);
+            Assert.Equal(3, sessions.Count());
+        }
+
+        [Fact]
+        public async Task Update_Session()
+        {
+            var session = UserSession.Create(MockData.MockSessionId, MockData.MockUserSession);
+
+            await sessionStore.CreateAsync(session);
+
+            var userSession = sessionStore.GetSession(MockData.MockSessionId);
+
+            Assert.NotNull(userSession);
+
+            userSession.SetExpirationTime(MockData.ExpirationTime);
+
+            await sessionStore.UpdateAsync(userSession);
+
+            userSession = sessionStore.GetSession(MockData.MockSessionId);
+
+            Assert.NotNull(userSession);
+            Assert.True(userSession.ExpirationTime.HasValue);
+            Assert.Equal(MockData.ExpirationTime, userSession.ExpirationTime);
+        }
+
+        [Fact]
+        public async Task Update_Non_Exist_Session()
+        {
+            var session = UserSession.Create(MockData.MockSessionId, MockData.MockUserSession);
+
+            await Assert.ThrowsAsync<InvalidOperationException>(() => sessionStore.UpdateAsync(session));
         }
     }
 }

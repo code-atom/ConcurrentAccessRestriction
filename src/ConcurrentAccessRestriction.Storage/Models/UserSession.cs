@@ -8,7 +8,7 @@ namespace ConcurrentAccessRestriction.Storage
 {
     public class UserSession : Session
     {
-        public string Username { get; set; }
+        public string Username { get; private set; }
 
         public override string SessionIdentifier
         {

@@ -8,7 +8,7 @@ using System.Text;
 
 namespace ConcurrentAccessRestriction.Default
 {
-    public class DefaultSessionResolver : ISessionResolver
+    internal class DefaultSessionResolver : ISessionResolver
     {
         private const string SessionIdClaim = "sessionId";
         private readonly ISessionService sessionService;
