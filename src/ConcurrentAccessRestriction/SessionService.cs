@@ -66,7 +66,7 @@ namespace ConcurrentAccessRestriction
             var currentUtc = systemClock.UtcNow;
             if (session.ExpirationTime.HasValue)
             {
-                var timeRemaining = currentUtc.Subtract(session.ExpirationTime.GetValueOrDefault(currentUtc));
+                var timeRemaining = session.ExpirationTime.Value.Subtract(currentUtc);
                 if (timeRemaining < TimeSpan.FromMinutes(1))
                 {
                     session.ExtendSession(option.Value.SlideExpirationTime);

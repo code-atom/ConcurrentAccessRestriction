@@ -113,6 +113,9 @@ namespace ConcurrentAccessRestriction.Tests
         [Fact]
         public async Task Set_New_Session_Expiration()
         {
+            var dateTime = DateTimeOffset.UtcNow;
+            mockSystemClock.SetupGet(x => x.UtcNow).Returns(dateTime);
+
             var claimIdentity = MockData.CLaimIdentity;
             claimIdentity.AddClaim(MockData.Claims.SessionId);
             mockHttpContext.Setup(x => x.User).Returns(new ClaimsPrincipal(claimIdentity));
@@ -124,14 +127,18 @@ namespace ConcurrentAccessRestriction.Tests
             await middleware.Invoke(mockHttpContext.Object, inMemorySessionService, inMemorySessionResolver);
 
             var session = inMemorySessionService.GetSession(MockData.MockSessionId);
+            var expectedExpirationTime = dateTime + option.Object.Value.SlideExpirationTime;
             Assert.NotNull(session);
             Assert.NotNull(session.ExpirationTime);
             Assert.False(session.IsExpired);
+            Assert.Equal(expectedExpirationTime, session.ExpirationTime);
         }
 
         [Fact]
         public async Task Check_Session_Extened_If_Session_Near_To_Expired()
         {
+            var dateTime = DateTimeOffset.UtcNow;
+            mockSystemClock.SetupGet(x => x.UtcNow).Returns(dateTime);
             var claimIdentity = MockData.CLaimIdentity;
             claimIdentity.AddClaim(MockData.Claims.SessionId);
             mockHttpContext.Setup(x => x.User).Returns(new ClaimsPrincipal(claimIdentity));
@@ -144,13 +151,29 @@ namespace ConcurrentAccessRestriction.Tests
 
             await middleware.Invoke(mockHttpContext.Object, inMemorySessionService, inMemorySessionResolver);
 
-
+            var session = inMemorySessionService.GetSession(MockData.MockSessionId);
+            var expectedExpirationTime = dateTime + TimeSpan.FromMinutes(1);
+            Assert.NotNull(session);
+            Assert.True(session.ExpirationTime.HasValue);
+            Assert.False(session.IsExpired);
+            Assert.Equal(expectedExpirationTime, session.ExpirationTime);
 
         }
 
         [Fact]
         public async Task Check_If_Two_Concurrent_Session_Check_And_Expired_Latest()
         {
+            var claimIdentity = MockData.CLaimIdentity;
+            claimIdentity.AddClaim(MockData.Claims.SessionId);
+            mockHttpContext.Setup(x => x.User).Returns(new ClaimsPrincipal(claimIdentity));
+            option.SetupGet(x => x.Value).Returns(new ConcurrentAccessRestrictionOptions { NumberOfAllowedSessions = 1 });
+
+            var sessionId = MockData.RandomSessionId;
+            await inMemorySessionService.AddSession(sessionId, MockData.MockUserSession);
+            await inMemorySessionService.ExtendSessionExpiration(sessionId);
+            await inMemorySessionService.AddSession(MockData.MockSessionId, MockData.MockUserSession);
+
+            await Assert.ThrowsAsync<SessionLimitExceedException>(() => middleware.Invoke(mockHttpContext.Object, inMemorySessionService, inMemorySessionResolver));
         }
 
     }

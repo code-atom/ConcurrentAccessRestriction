@@ -1,5 +1,8 @@
+using ConcurrentAccessRestriction.Configuration;
+using ConcurrentAccessRestriction.Interface;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.AzureAD.UI;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -7,6 +10,9 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
+using System;
+using System.Security.Claims;
 
 namespace ConcurrentAccessRestriction.WebClient
 {
@@ -24,6 +30,7 @@ namespace ConcurrentAccessRestriction.WebClient
         {
             services.AddAuthentication(AzureADDefaults.AuthenticationScheme)
                 .AddAzureAD(options => Configuration.Bind("AzureAd", options));
+            services.AddSingleton<IConfigureOptions<OpenIdConnectOptions>, AzureADOpenIdConnectOptionsConfiguration>();
 
             services.AddControllersWithViews(options =>
             {
@@ -32,6 +39,11 @@ namespace ConcurrentAccessRestriction.WebClient
                     .Build();
                 options.Filters.Add(new AuthorizeFilter(policy));
             });
+            services.AddConcurrentAccessRestriction(options =>
+            {
+                options.NumberOfAllowedSessions = 1;
+            }).AddInMemorySessionStore();
+
             services.AddRazorPages();
         }
 
@@ -54,8 +66,8 @@ namespace ConcurrentAccessRestriction.WebClient
             app.UseRouting();
 
             app.UseAuthentication();
+            app.UseConcurrentAccessRestriction();
             app.UseAuthorization();
-
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(

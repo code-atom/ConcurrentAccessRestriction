@@ -157,6 +157,8 @@ namespace ConcurrentAccessRestriction.Tests
 
             await sessionService.ExtendSessionExpiration(sessionId);
 
+            await sessionService.ExtendSessionExpiration(sessionId);
+
             var session = sessionService.GetSession(sessionId);
             var expectedExpirationTime = dateTime + TimeSpan.FromMinutes(2);
             Assert.NotNull(session);
