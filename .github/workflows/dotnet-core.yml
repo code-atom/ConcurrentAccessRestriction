@@ -21,5 +21,9 @@ jobs:
       run: dotnet restore ./src/ConcurrentAccessRestriction.sln
     - name: Build
       run: dotnet build ./src/ConcurrentAccessRestriction.sln --configuration Release --no-restore
+    - name: SonarCloud Scan
+      uses: SonarSource/sonarcloud-github-action@v1.4
+      with:
+        projectBaseDir: "./src/"
     - name: Test
       run: dotnet test ./src/ConcurrentAccessRestriction.sln
